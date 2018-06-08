@@ -36,6 +36,7 @@ DOCKER_TIZENRT_OS_PATH = fs.join(DOCKER_TIZENRT_PATH, 'os')
 DOCKER_TIZENRT_OS_TOOLS_PATH = fs.join(DOCKER_TIZENRT_OS_PATH, 'tools')
 
 DOCKER_NUTTX_PATH =fs.join(DOCKER_ROOT_PATH, 'nuttx')
+DOCKER_NUTTX_TOOLS_PATH = fs.join(DOCKER_NUTTX_PATH, 'tools')
 
 DOCKER_NAME = 'iotjs_docker'
 BUILDTYPES = ['debug', 'release']
@@ -60,7 +61,7 @@ def run_docker():
     ex.check_run_cmd('docker', ['run', '-dit', '--privileged',
                      '--name', DOCKER_NAME, '-v',
                      '%s:%s' % (TRAVIS_BUILD_PATH, DOCKER_IOTJS_PATH),
-                     'iotjs/ubuntu:0.6'])
+                     'iotjs/ubuntu:0.7'])
 
 def exec_docker(cwd, cmd):
     exec_cmd = 'cd %s && ' % cwd + ' '.join(cmd)
@@ -119,6 +120,8 @@ if __name__ == '__main__':
 
     elif test == 'stm32f4dis':
         for buildtype in BUILDTYPES:
+            exec_docker(DOCKER_NUTTX_PATH, ['make', 'distclean'])
+            exec_docker(DOCKER_NUTTX_TOOLS_PATH, ['./configure.sh', 'stm32f4discovery/usbnsh'])
             exec_docker(DOCKER_NUTTX_PATH, ['make', 'clean'])
             exec_docker(DOCKER_NUTTX_PATH, ['make', 'context'])
             # Build IoT.js
